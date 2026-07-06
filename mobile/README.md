@@ -20,7 +20,8 @@ Then scan the QR code with the [Expo Go](https://expo.dev/go) app on your phone 
 - [src/tiers.ts](src/tiers.ts) — tier assignments, labels, and colors, mirroring the web map.
 - [src/neighborhoods.ts](src/neighborhoods.ts) — parses the GeoJSON and does point-in-polygon lookup (Turf.js).
 - [App.tsx](App.tsx) — map with tier-colored polygons, a banner showing the current neighborhood, and the warning logic: a location watch (~50 m granularity), a 2-consecutive-fix debounce so GPS jitter at polygon boundaries doesn't cause flapping, and a 30-minute per-neighborhood re-warn cooldown.
-- [src/Acknowledgements.tsx](src/Acknowledgements.tsx) — open-source licenses screen (ⓘ button on the map), backed by [assets/data/licenses.json](assets/data/licenses.json). Regenerate it after adding or upgrading dependencies with `npm run generate-licenses`.
+- Open-source license notices are hosted at [licenses.html](../licenses.html) (served via GitHub Pages at `https://granborg.github.io/mke_map/licenses.html`) rather than bundled in the app — link it from the App Store listing. Regenerate after adding or upgrading dependencies with `npm run generate-licenses`.
+- [store/description.md](store/description.md) — source of truth for the App Store Connect listing (name, subtitle, description, keywords, URLs). Paste into App Store Connect when it changes.
 
 ## Roadmap
 
