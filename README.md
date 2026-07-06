@@ -30,6 +30,10 @@ If you need defensible, up-to-date numbers — for a report or a housing decisio
 - The Milwaukee Police Department's interactive crime map
 - Milwaukee's open data portal: [data.milwaukee.gov](https://data.milwaukee.gov)
 
+## Mobile app
+
+[mobile/](mobile/) contains an Expo (React Native) app that renders the same map, detects which neighborhood you're currently in, and warns when you enter a High/Highest tier neighborhood. See [mobile/README.md](mobile/README.md) for setup and roadmap.
+
 ## Implementation
 
 A single static page ([index.html](index.html)) built with [D3.js](https://d3js.org/). Neighborhood boundaries are loaded from the [blackmad/neighborhoods](https://github.com/blackmad/neighborhoods) GeoJSON collection. Served via GitHub Pages (deploy from branch: `main`, root). `crime-rate-map.html` is the original source fragment; `index.html` is the standalone version with the theme styles it needs.
