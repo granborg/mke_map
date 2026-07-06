@@ -1,4 +1,4 @@
-import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Modal, Pressable, ScrollView, StyleSheet, Switch, Text, View } from "react-native";
 import { CITY_LIST } from "./cities";
 import type { Settings } from "./settings";
 import type { Tier } from "./tiers";
@@ -76,6 +76,22 @@ export default function SettingsScreen({
                 onPress={() => onChange({ ...settings, warnTier: opt.tier })}
               />
             ))}
+          </View>
+          <Text style={styles.sectionTitle}>Notifications</Text>
+          <View style={styles.section}>
+            <View style={styles.row}>
+              <View style={styles.rowText}>
+                <Text style={styles.rowLabel}>Background alerts</Text>
+                <Text style={styles.rowDetail}>
+                  Notify even when the app is closed. Needs “Always” location
+                  access and a development build (not Expo Go).
+                </Text>
+              </View>
+              <Switch
+                value={settings.backgroundAlerts}
+                onValueChange={(on) => onChange({ ...settings, backgroundAlerts: on })}
+              />
+            </View>
           </View>
           <Text style={styles.footnote}>
             Tiers are indicative bands of reported Part I offenses per 1,000

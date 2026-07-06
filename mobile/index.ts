@@ -1,5 +1,9 @@
 import { registerRootComponent } from 'expo';
 
+// Defines the background location task at global scope — required so the
+// task exists when the OS relaunches the app headless for a location update.
+import './src/backgroundLocation';
+
 import App from './App';
 
 // registerRootComponent calls AppRegistry.registerComponent('main', () => App);

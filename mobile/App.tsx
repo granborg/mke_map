@@ -3,14 +3,14 @@ import { StatusBar } from "expo-status-bar";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Alert, Pressable, StyleSheet, Text, View } from "react-native";
 import MapView, { Polygon } from "react-native-maps";
+import { startBackgroundAlerts, stopBackgroundAlerts } from "./src/backgroundLocation";
 import { CITIES } from "./src/cities";
 import { findNeighborhood, Neighborhood, neighborhoodsFor } from "./src/neighborhoods";
 import { DEFAULT_SETTINGS, loadSettings, saveSettings, Settings } from "./src/settings";
 import SettingsScreen from "./src/SettingsScreen";
 import { Tier, TIER_COLORS, TIER_LABELS } from "./src/tiers";
+import { shouldWarn, warningText, warnKey } from "./src/warnings";
 
-// Suppress repeat warnings for the same neighborhood within this window.
-const REWARN_MS = 30 * 60 * 1000;
 // Consecutive location fixes that must agree before we commit a neighborhood
 // change — absorbs GPS jitter along polygon boundaries.
 const CONFIRM_FIXES = 2;
@@ -53,7 +53,6 @@ export default function App() {
   const neighborhoods = useMemo(() => neighborhoodsFor(city, liveTiers), [city, liveTiers]);
 
   const pending = useRef<{ name: string | null; count: number }>({ name: null, count: 0 });
-  const lastWarned = useRef(new Map<string, number>());
   const currentRef = useRef<Neighborhood | null>(null);
   const lastFix = useRef<{ latitude: number; longitude: number } | null>(null);
   // The location callback outlives renders; refs keep it reading fresh values
@@ -62,12 +61,31 @@ export default function App() {
   neighborhoodsRef.current = neighborhoods;
   const warnTierRef = useRef(settings.warnTier);
   warnTierRef.current = settings.warnTier;
-  const cityNameRef = useRef(city.name);
-  cityNameRef.current = city.name;
+  const cityRef = useRef(city);
+  cityRef.current = city;
 
   useEffect(() => {
     loadSettings().then(setSettings);
   }, []);
+
+  // Keep the background task in sync with the settings toggle. Runs on every
+  // startup too: start/stop are idempotent, and this re-verifies permissions.
+  useEffect(() => {
+    if (settings.backgroundAlerts) {
+      startBackgroundAlerts().then((result) => {
+        if (!result.ok) {
+          Alert.alert("Background alerts unavailable", result.reason);
+          setSettings((s) => {
+            const next = { ...s, backgroundAlerts: false };
+            saveSettings(next);
+            return next;
+          });
+        }
+      });
+    } else {
+      stopBackgroundAlerts().catch(() => {});
+    }
+  }, [settings.backgroundAlerts]);
 
   // Refresh tiers from the city's open-data API; offline keeps bundled tiers.
   useEffect(() => {
@@ -88,7 +106,6 @@ export default function App() {
   useEffect(() => {
     // Switching city invalidates everything derived from the old polygons.
     pending.current = { name: null, count: 0 };
-    lastWarned.current.clear();
     currentRef.current = null;
     lastFix.current = null;
     setCurrent(null);
@@ -134,15 +151,12 @@ export default function App() {
 
           const warnTier = warnTierRef.current;
           if (hood && warnTier !== null && hood.tier >= warnTier) {
-            const warned = lastWarned.current.get(hood.name) ?? 0;
-            if (Date.now() - warned > REWARN_MS) {
-              lastWarned.current.set(hood.name, Date.now());
-              const rel = hood.tier >= 5 ? "well above" : hood.tier >= 4 ? "above" : "near";
-              Alert.alert(
-                `Entering ${hood.name}`,
-                `Reported crime rate is ${rel} the ${cityNameRef.current} citywide average (${TIER_LABELS[hood.tier]}).`
-              );
-            }
+            // Cooldown is persisted and shared with the background task, so
+            // a background notification suppresses the in-app re-alert.
+            const { title, body } = warningText(hood, cityRef.current.name);
+            shouldWarn(warnKey(cityRef.current, hood)).then((yes) => {
+              if (yes) Alert.alert(title, body);
+            });
           }
         }
       );

@@ -6,9 +6,15 @@ export interface Settings {
   cityId: CityId;
   /** Warn when entering a neighborhood at or above this tier; null = never. */
   warnTier: Tier | null;
+  /** Notify via background location task when the app is closed. */
+  backgroundAlerts: boolean;
 }
 
-export const DEFAULT_SETTINGS: Settings = { cityId: "milwaukee", warnTier: 4 };
+export const DEFAULT_SETTINGS: Settings = {
+  cityId: "milwaukee",
+  warnTier: 4,
+  backgroundAlerts: false,
+};
 
 const KEY = "settings.v1";
 

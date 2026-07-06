@@ -27,9 +27,14 @@
       [
         "expo-location",
         {
-          "locationWhenInUsePermission": "This app uses your location to show which Milwaukee neighborhood you are in and its relative crime-rate tier."
+          "locationWhenInUsePermission": "This app uses your location to show which neighborhood you are in and its relative crime-rate tier.",
+          "locationAlwaysAndWhenInUsePermission": "Background location lets this app warn you when you enter a higher-crime neighborhood, even while the app is closed.",
+          "isIosBackgroundLocationEnabled": true,
+          "isAndroidBackgroundLocationEnabled": true,
+          "isAndroidForegroundServiceEnabled": true
         }
-      ]
+      ],
+      "expo-notifications"
     ]
   }
 }

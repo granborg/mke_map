@@ -8,7 +8,9 @@
     "@turf/helpers": "^7.3.5",
     "expo": "~57.0.2",
     "expo-location": "~57.0.2",
+    "expo-notifications": "~57.0.3",
     "expo-status-bar": "~57.0.0",
+    "expo-task-manager": "~57.0.2",
     "react": "19.2.3",
     "react-native": "0.86.0",
     "react-native-maps": "1.27.2"
