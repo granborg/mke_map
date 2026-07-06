@@ -1,17 +1,17 @@
 {
   "expo": {
-    "name": "MKE Neighborhood Watch",
-    "slug": "mke-neighborhood-watch",
+    "name": "City Scout",
+    "slug": "city-scout",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.granborg.mkeneighborhoodwatch"
+      "bundleIdentifier": "com.granborg.cityscout"
     },
     "android": {
-      "package": "com.granborg.mkeneighborhoodwatch",
+      "package": "com.granborg.cityscout",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/android-icon-foreground.png",

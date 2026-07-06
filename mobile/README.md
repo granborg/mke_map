@@ -1,4 +1,4 @@
-# MKE Neighborhood Watch (mobile app)
+# City Scout (mobile app)
 
 Expo (React Native) app that shows a neighborhood crime-tier map for Milwaukee (190 neighborhoods) or Chicago (77 community areas), tracks which neighborhood you're currently in, and pops a warning when you enter a higher-crime area. The city and the warning threshold are configurable in Settings (⚙︎ button on the map).
 

@@ -98,7 +98,7 @@ export async function startBackgroundAlerts(): Promise<{ ok: true } | { ok: fals
       activityType: Location.LocationActivityType.OtherNavigation,
       showsBackgroundLocationIndicator: false,
       foregroundService: {
-        notificationTitle: "Neighborhood Watch is on",
+        notificationTitle: "City Scout is on",
         notificationBody: "Watching for entry into higher-crime neighborhoods.",
       },
     });

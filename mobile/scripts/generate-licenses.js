@@ -65,7 +65,7 @@ const html = `<!DOCTYPE html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>MKE Neighborhood Watch — Open-Source Licenses</title>
+<title>City Scout — Open-Source Licenses</title>
 <style>
   body { font-family: -apple-system, system-ui, sans-serif; max-width: 800px; margin: 0 auto; padding: 24px 16px; color: #222; }
   h1 { font-size: 1.4rem; }
@@ -82,7 +82,7 @@ const html = `<!DOCTYPE html>
 </style>
 </head>
 <body>
-<h1>MKE Neighborhood Watch — Open-Source Licenses</h1>
+<h1>City Scout — Open-Source Licenses</h1>
 <p>This app is built with the ${entries.length} open-source packages below. Click a package to view its license text.</p>
 ${items}
 </body>
