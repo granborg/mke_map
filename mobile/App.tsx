@@ -23,6 +23,14 @@ function hexWithAlpha(hex: string, alpha: number): string {
   return hex + Math.round(alpha * 255).toString(16).padStart(2, "0");
 }
 
+// Light tier colors (Lowest/Lower pinks, non-residential gray) need dark text.
+function isLightColor(hex: string): boolean {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  return (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255 > 0.45;
+}
+
 export default function App() {
   const [permissionDenied, setPermissionDenied] = useState(false);
   const [current, setCurrent] = useState<Neighborhood | null>(null);
@@ -103,8 +111,12 @@ export default function App() {
         )}
       </MapView>
       <View style={[styles.banner, { backgroundColor: banner.color }]}>
-        <Text style={styles.bannerTitle}>{banner.title}</Text>
-        <Text style={styles.bannerSubtitle}>{banner.subtitle}</Text>
+        <Text style={[styles.bannerTitle, isLightColor(banner.color) && styles.bannerTitleDark]}>
+          {banner.title}
+        </Text>
+        <Text style={[styles.bannerSubtitle, isLightColor(banner.color) && styles.bannerSubtitleDark]}>
+          {banner.subtitle}
+        </Text>
       </View>
       <StatusBar style="light" />
     </View>
@@ -130,4 +142,6 @@ const styles = StyleSheet.create({
   },
   bannerTitle: { color: "#fff", fontSize: 17, fontWeight: "600" },
   bannerSubtitle: { color: "rgba(255,255,255,0.9)", fontSize: 13, marginTop: 2 },
+  bannerTitleDark: { color: "#3b241c" },
+  bannerSubtitleDark: { color: "rgba(59,36,28,0.75)" },
 });
