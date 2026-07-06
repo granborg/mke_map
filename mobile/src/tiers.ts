@@ -3,11 +3,11 @@ export type Tier = 0 | 1 | 2 | 3 | 4 | 5;
 
 export const TIER_LABELS: Record<Tier, string> = {
   0: "Park / non-residential",
-  1: "Lowest — under ~25 per 1,000",
-  2: "Lower — ~25–45 per 1,000",
-  3: "Moderate — ~45–65 per 1,000",
-  4: "High — ~65–100 per 1,000",
-  5: "Highest — over ~100 per 1,000",
+  1: "Lowest: under ~25 per 1,000",
+  2: "Lower: ~25–45 per 1,000",
+  3: "Moderate: ~45–65 per 1,000",
+  4: "High: ~65–100 per 1,000",
+  5: "Highest: over ~100 per 1,000",
 };
 
 export const TIER_COLORS: Record<Tier, string> = {
