@@ -1,23 +1,33 @@
 import * as Location from "expo-location";
 import { StatusBar } from "expo-status-bar";
-import { useEffect, useRef, useState } from "react";
-import { Alert, StyleSheet, Text, View } from "react-native";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Alert, Pressable, StyleSheet, Text, View } from "react-native";
 import MapView, { Polygon } from "react-native-maps";
-import { findNeighborhood, Neighborhood, NEIGHBORHOODS } from "./src/neighborhoods";
-import { TIER_COLORS, TIER_LABELS, WARN_TIER } from "./src/tiers";
-
-const MILWAUKEE_REGION = {
-  latitude: 43.06,
-  longitude: -87.97,
-  latitudeDelta: 0.32,
-  longitudeDelta: 0.28,
-};
+import { CITIES } from "./src/cities";
+import { findNeighborhood, Neighborhood, neighborhoodsFor } from "./src/neighborhoods";
+import { DEFAULT_SETTINGS, loadSettings, saveSettings, Settings } from "./src/settings";
+import SettingsScreen from "./src/SettingsScreen";
+import { Tier, TIER_COLORS, TIER_LABELS } from "./src/tiers";
 
 // Suppress repeat warnings for the same neighborhood within this window.
 const REWARN_MS = 30 * 60 * 1000;
 // Consecutive location fixes that must agree before we commit a neighborhood
 // change — absorbs GPS jitter along polygon boundaries.
 const CONFIRM_FIXES = 2;
+// A fix farther than this from the previous one can't be boundary jitter
+// (drives arrive in ~50 m steps), so commit it immediately. Without this,
+// a teleported location (simulator, or GPS reacquiring after a tunnel)
+// yields a single fix that the debounce would swallow forever.
+const JUMP_METERS = 500;
+
+function distanceMeters(
+  a: { latitude: number; longitude: number },
+  b: { latitude: number; longitude: number }
+): number {
+  const dLat = (b.latitude - a.latitude) * 111320;
+  const dLng = (b.longitude - a.longitude) * 111320 * Math.cos((a.latitude * Math.PI) / 180);
+  return Math.hypot(dLat, dLng);
+}
 
 function hexWithAlpha(hex: string, alpha: number): string {
   return hex + Math.round(alpha * 255).toString(16).padStart(2, "0");
@@ -32,15 +42,57 @@ function isLightColor(hex: string): boolean {
 }
 
 export default function App() {
+  const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
+  const [showSettings, setShowSettings] = useState(false);
   const [permissionDenied, setPermissionDenied] = useState(false);
   const [current, setCurrent] = useState<Neighborhood | null>(null);
   const [located, setLocated] = useState(false);
+  const [liveTiers, setLiveTiers] = useState<Map<string, Tier> | null>(null);
+
+  const city = CITIES[settings.cityId];
+  const neighborhoods = useMemo(() => neighborhoodsFor(city, liveTiers), [city, liveTiers]);
 
   const pending = useRef<{ name: string | null; count: number }>({ name: null, count: 0 });
   const lastWarned = useRef(new Map<string, number>());
   const currentRef = useRef<Neighborhood | null>(null);
+  const lastFix = useRef<{ latitude: number; longitude: number } | null>(null);
+  // The location callback outlives renders; refs keep it reading fresh values
+  // without resubscribing on every settings change.
+  const neighborhoodsRef = useRef(neighborhoods);
+  neighborhoodsRef.current = neighborhoods;
+  const warnTierRef = useRef(settings.warnTier);
+  warnTierRef.current = settings.warnTier;
+  const cityNameRef = useRef(city.name);
+  cityNameRef.current = city.name;
 
   useEffect(() => {
+    loadSettings().then(setSettings);
+  }, []);
+
+  // Refresh tiers from the city's open-data API; offline keeps bundled tiers.
+  useEffect(() => {
+    let cancelled = false;
+    setLiveTiers(null);
+    if (!city.fetchLiveTiers) return;
+    city
+      .fetchLiveTiers()
+      .then((tiers) => {
+        if (!cancelled) setLiveTiers(tiers);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [city]);
+
+  useEffect(() => {
+    // Switching city invalidates everything derived from the old polygons.
+    pending.current = { name: null, count: 0 };
+    lastWarned.current.clear();
+    currentRef.current = null;
+    lastFix.current = null;
+    setCurrent(null);
+
     let sub: Location.LocationSubscription | undefined;
     (async () => {
       const { status } = await Location.requestForegroundPermissionsAsync();
@@ -52,7 +104,12 @@ export default function App() {
         { accuracy: Location.Accuracy.Balanced, distanceInterval: 50 },
         (loc) => {
           setLocated(true);
-          const hood = findNeighborhood(loc.coords.latitude, loc.coords.longitude);
+          const fix = { latitude: loc.coords.latitude, longitude: loc.coords.longitude };
+          const jumped =
+            lastFix.current !== null && distanceMeters(lastFix.current, fix) > JUMP_METERS;
+          lastFix.current = fix;
+
+          const hood = findNeighborhood(neighborhoodsRef.current, fix.latitude, fix.longitude);
           const name = hood?.name ?? null;
 
           if (name === (currentRef.current?.name ?? null)) {
@@ -64,19 +121,26 @@ export default function App() {
           } else {
             pending.current = { name, count: 1 };
           }
-          if (pending.current.count < CONFIRM_FIXES) return;
+          // Debounce only plausible boundary jitter: a first-ever fix or a
+          // long jump is authoritative — there may never be a second fix if
+          // the device is stationary.
+          const confirmed =
+            pending.current.count >= CONFIRM_FIXES || currentRef.current === null || jumped;
+          if (!confirmed) return;
 
           pending.current = { name: null, count: 0 };
           currentRef.current = hood;
           setCurrent(hood);
 
-          if (hood && hood.tier >= WARN_TIER) {
+          const warnTier = warnTierRef.current;
+          if (hood && warnTier !== null && hood.tier >= warnTier) {
             const warned = lastWarned.current.get(hood.name) ?? 0;
             if (Date.now() - warned > REWARN_MS) {
               lastWarned.current.set(hood.name, Date.now());
+              const rel = hood.tier >= 5 ? "well above" : hood.tier >= 4 ? "above" : "near";
               Alert.alert(
                 `Entering ${hood.name}`,
-                `Reported crime rate is ${hood.tier === 5 ? "well above" : "above"} the Milwaukee citywide average (${TIER_LABELS[hood.tier]}).`
+                `Reported crime rate is ${rel} the ${cityNameRef.current} citywide average (${TIER_LABELS[hood.tier]}).`
               );
             }
           }
@@ -84,20 +148,25 @@ export default function App() {
       );
     })();
     return () => sub?.remove();
-  }, []);
+  }, [settings.cityId]);
+
+  // Live tiers can land after `current` was set; show the fresh tier.
+  const currentTier = current
+    ? neighborhoods.find((n) => n.name === current.name)?.tier ?? current.tier
+    : null;
 
   const banner = permissionDenied
     ? { color: "#555555", title: "Location permission denied", subtitle: "Enable location access to see your current neighborhood." }
     : !located
       ? { color: "#555555", title: "Locating…", subtitle: "Waiting for a GPS fix." }
-      : current
-        ? { color: TIER_COLORS[current.tier], title: current.name, subtitle: TIER_LABELS[current.tier] }
-        : { color: "#555555", title: "Outside Milwaukee", subtitle: "No neighborhood data for this location." };
+      : current && currentTier !== null
+        ? { color: TIER_COLORS[currentTier], title: current.name, subtitle: TIER_LABELS[currentTier] }
+        : { color: "#555555", title: `Outside ${city.name}`, subtitle: "No neighborhood data for this location." };
 
   return (
     <View style={styles.container}>
-      <MapView style={styles.map} initialRegion={MILWAUKEE_REGION} showsUserLocation>
-        {NEIGHBORHOODS.map((n) =>
+      <MapView key={city.id} style={styles.map} initialRegion={city.region} showsUserLocation>
+        {neighborhoods.map((n) =>
           n.polygons.map((p, i) => (
             <Polygon
               key={`${n.name}-${i}`}
@@ -118,6 +187,23 @@ export default function App() {
           {banner.subtitle}
         </Text>
       </View>
+      <Pressable
+        style={styles.settingsButton}
+        hitSlop={8}
+        onPress={() => setShowSettings(true)}
+        accessibilityLabel="Settings"
+      >
+        <Text style={styles.settingsButtonText}>⚙︎</Text>
+      </Pressable>
+      <SettingsScreen
+        visible={showSettings}
+        settings={settings}
+        onChange={(next) => {
+          setSettings(next);
+          saveSettings(next);
+        }}
+        onClose={() => setShowSettings(false)}
+      />
       <StatusBar style="light" />
     </View>
   );
@@ -144,4 +230,16 @@ const styles = StyleSheet.create({
   bannerSubtitle: { color: "rgba(255,255,255,0.9)", fontSize: 13, marginTop: 2 },
   bannerTitleDark: { color: "#3b241c" },
   bannerSubtitleDark: { color: "rgba(59,36,28,0.75)" },
+  settingsButton: {
+    position: "absolute",
+    bottom: 32,
+    right: 16,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "rgba(0,0,0,0.55)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  settingsButtonText: { color: "#fff", fontSize: 22, lineHeight: 26 },
 });

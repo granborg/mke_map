@@ -1,0 +1,387 @@
+{
+  "Albany Park": {
+    "area": 14,
+    "population": 46804,
+    "tier": 1
+  },
+  "Archer Heights": {
+    "area": 57,
+    "population": 14098,
+    "tier": 2
+  },
+  "Armour Square": {
+    "area": 34,
+    "population": 14176,
+    "tier": 2
+  },
+  "Ashburn": {
+    "area": 70,
+    "population": 42255,
+    "tier": 1
+  },
+  "Auburn Gresham": {
+    "area": 71,
+    "population": 45109,
+    "tier": 3
+  },
+  "Austin": {
+    "area": 25,
+    "population": 99100,
+    "tier": 3
+  },
+  "Avalon Park": {
+    "area": 45,
+    "population": 9347,
+    "tier": 3
+  },
+  "Avondale": {
+    "area": 21,
+    "population": 35477,
+    "tier": 2
+  },
+  "Belmont Cragin": {
+    "area": 19,
+    "population": 72957,
+    "tier": 1
+  },
+  "Beverly": {
+    "area": 72,
+    "population": 19603,
+    "tier": 1
+  },
+  "Bridgeport": {
+    "area": 60,
+    "population": 33002,
+    "tier": 1
+  },
+  "Brighton Park": {
+    "area": 58,
+    "population": 42213,
+    "tier": 1
+  },
+  "Burnside": {
+    "area": 47,
+    "population": 2137,
+    "tier": 3
+  },
+  "Calumet Heights": {
+    "area": 48,
+    "population": 11643,
+    "tier": 3
+  },
+  "Chatham": {
+    "area": 44,
+    "population": 30875,
+    "tier": 4
+  },
+  "Chicago Lawn": {
+    "area": 66,
+    "population": 53333,
+    "tier": 2
+  },
+  "Clearing": {
+    "area": 64,
+    "population": 24962,
+    "tier": 1
+  },
+  "Douglas": {
+    "area": 35,
+    "population": 21758,
+    "tier": 3
+  },
+  "Dunning": {
+    "area": 17,
+    "population": 41791,
+    "tier": 1
+  },
+  "East Garfield Park": {
+    "area": 27,
+    "population": 20536,
+    "tier": 3
+  },
+  "East Side": {
+    "area": 52,
+    "population": 22816,
+    "tier": 2
+  },
+  "Edgewater": {
+    "area": 77,
+    "population": 56157,
+    "tier": 2
+  },
+  "Edison Park": {
+    "area": 9,
+    "population": 11199,
+    "tier": 1
+  },
+  "Englewood": {
+    "area": 68,
+    "population": 21377,
+    "tier": 4
+  },
+  "Forest Glen": {
+    "area": 12,
+    "population": 19507,
+    "tier": 1
+  },
+  "Fuller Park": {
+    "area": 37,
+    "population": 2214,
+    "tier": 5
+  },
+  "Gage Park": {
+    "area": 63,
+    "population": 35639,
+    "tier": 2
+  },
+  "Garfield Ridge": {
+    "area": 56,
+    "population": 36353,
+    "tier": 1
+  },
+  "Grand Boulevard": {
+    "area": 38,
+    "population": 26340,
+    "tier": 3
+  },
+  "Greater Grand Crossing": {
+    "area": 69,
+    "population": 29637,
+    "tier": 4
+  },
+  "Hegewisch": {
+    "area": 55,
+    "population": 8886,
+    "tier": 2
+  },
+  "Hermosa": {
+    "area": 20,
+    "population": 22841,
+    "tier": 1
+  },
+  "Humboldt Park": {
+    "area": 23,
+    "population": 55221,
+    "tier": 2
+  },
+  "Hyde Park": {
+    "area": 41,
+    "population": 29593,
+    "tier": 3
+  },
+  "Irving Park": {
+    "area": 16,
+    "population": 53799,
+    "tier": 1
+  },
+  "Jefferson Park": {
+    "area": 11,
+    "population": 26625,
+    "tier": 1
+  },
+  "Kenwood": {
+    "area": 39,
+    "population": 18148,
+    "tier": 3
+  },
+  "Lake View": {
+    "area": 6,
+    "population": 101161,
+    "tier": 2
+  },
+  "Lincoln Park": {
+    "area": 7,
+    "population": 67764,
+    "tier": 2
+  },
+  "Lincoln Square": {
+    "area": 4,
+    "population": 41589,
+    "tier": 1
+  },
+  "Logan Square": {
+    "area": 22,
+    "population": 71128,
+    "tier": 2
+  },
+  "Loop": {
+    "area": 32,
+    "population": 43261,
+    "tier": 5
+  },
+  "Lower West Side": {
+    "area": 31,
+    "population": 33261,
+    "tier": 2
+  },
+  "McKinley Park": {
+    "area": 59,
+    "population": 15441,
+    "tier": 2
+  },
+  "Montclare": {
+    "area": 18,
+    "population": 14094,
+    "tier": 1
+  },
+  "Morgan Park": {
+    "area": 75,
+    "population": 21832,
+    "tier": 2
+  },
+  "Mount Greenwood": {
+    "area": 74,
+    "population": 18558,
+    "tier": 1
+  },
+  "Near North Side": {
+    "area": 8,
+    "population": 97385,
+    "tier": 3
+  },
+  "Near South Side": {
+    "area": 33,
+    "population": 27535,
+    "tier": 2
+  },
+  "Near West Side": {
+    "area": 28,
+    "population": 65999,
+    "tier": 4
+  },
+  "New City": {
+    "area": 61,
+    "population": 41662,
+    "tier": 2
+  },
+  "North Center": {
+    "area": 5,
+    "population": 35444,
+    "tier": 1
+  },
+  "North Lawndale": {
+    "area": 29,
+    "population": 31268,
+    "tier": 3
+  },
+  "North Park": {
+    "area": 13,
+    "population": 18679,
+    "tier": 2
+  },
+  "Norwood Park": {
+    "area": 10,
+    "population": 41791,
+    "tier": 1
+  },
+  "O'Hare": {
+    "area": 76,
+    "population": 14997,
+    "tier": 3
+  },
+  "Oakland": {
+    "area": 36,
+    "population": 6949,
+    "tier": 3
+  },
+  "Portage Park": {
+    "area": 15,
+    "population": 61811,
+    "tier": 1
+  },
+  "Pullman": {
+    "area": 50,
+    "population": 6783,
+    "tier": 4
+  },
+  "Riverdale": {
+    "area": 54,
+    "population": 7500,
+    "tier": 3
+  },
+  "Rogers Park": {
+    "area": 1,
+    "population": 54255,
+    "tier": 2
+  },
+  "Roseland": {
+    "area": 49,
+    "population": 36819,
+    "tier": 3
+  },
+  "South Chicago": {
+    "area": 46,
+    "population": 29338,
+    "tier": 3
+  },
+  "South Deering": {
+    "area": 51,
+    "population": 14218,
+    "tier": 3
+  },
+  "South Lawndale": {
+    "area": 30,
+    "population": 68751,
+    "tier": 1
+  },
+  "South Shore": {
+    "area": 43,
+    "population": 51948,
+    "tier": 4
+  },
+  "Uptown": {
+    "area": 3,
+    "population": 55448,
+    "tier": 2
+  },
+  "Washington Heights": {
+    "area": 73,
+    "population": 25215,
+    "tier": 2
+  },
+  "Washington Park": {
+    "area": 40,
+    "population": 13112,
+    "tier": 4
+  },
+  "West Elsdon": {
+    "area": 62,
+    "population": 18423,
+    "tier": 1
+  },
+  "West Englewood": {
+    "area": 67,
+    "population": 26926,
+    "tier": 3
+  },
+  "West Garfield Park": {
+    "area": 26,
+    "population": 15610,
+    "tier": 4
+  },
+  "West Lawn": {
+    "area": 65,
+    "population": 32531,
+    "tier": 2
+  },
+  "West Pullman": {
+    "area": 53,
+    "population": 24333,
+    "tier": 3
+  },
+  "West Ridge": {
+    "area": 2,
+    "population": 78241,
+    "tier": 1
+  },
+  "West Town": {
+    "area": 24,
+    "population": 86596,
+    "tier": 3
+  },
+  "Woodlawn": {
+    "area": 42,
+    "population": 25095,
+    "tier": 3
+  }
+}

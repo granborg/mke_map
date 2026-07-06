@@ -1,9 +1,9 @@
 import booleanPointInPolygon from "@turf/boolean-point-in-polygon";
 import { point } from "@turf/helpers";
-import type { Feature, FeatureCollection, MultiPolygon } from "geojson";
+import type { Feature, MultiPolygon } from "geojson";
 import type { LatLng } from "react-native-maps";
-import raw from "../assets/data/milwaukee.json";
-import { Tier, tierFor } from "./tiers";
+import type { CityConfig, CityId } from "./cities";
+import type { Tier } from "./tiers";
 
 export interface NeighborhoodPolygon {
   outer: LatLng[];
@@ -17,22 +17,40 @@ export interface Neighborhood {
   polygons: NeighborhoodPolygon[];
 }
 
-const collection = raw as FeatureCollection<MultiPolygon, { name: string }>;
-
 const toLatLng = (ring: number[][]): LatLng[] =>
   ring.map(([longitude, latitude]) => ({ latitude, longitude }));
 
-export const NEIGHBORHOODS: Neighborhood[] = collection.features.map((feature) => ({
-  name: feature.properties.name,
-  tier: tierFor(feature.properties.name),
-  feature,
-  polygons: feature.geometry.coordinates.map((rings) => ({
-    outer: toLatLng(rings[0]),
-    holes: rings.slice(1).map(toLatLng),
-  })),
-}));
+const cache = new Map<CityId, Neighborhood[]>();
 
-export function findNeighborhood(latitude: number, longitude: number): Neighborhood | null {
+export function neighborhoodsFor(
+  city: CityConfig,
+  liveTiers?: Map<string, Tier> | null
+): Neighborhood[] {
+  let base = cache.get(city.id);
+  if (!base) {
+    base = city.collection.features.map((feature) => ({
+      name: feature.properties.name,
+      tier: city.tierFor(feature.properties.name),
+      feature,
+      polygons: feature.geometry.coordinates.map((rings) => ({
+        outer: toLatLng(rings[0]),
+        holes: rings.slice(1).map(toLatLng),
+      })),
+    }));
+    cache.set(city.id, base);
+  }
+  if (!liveTiers) return base;
+  return base.map((n) => {
+    const tier = liveTiers.get(n.name);
+    return tier !== undefined && tier !== n.tier ? { ...n, tier } : n;
+  });
+}
+
+export function findNeighborhood(
+  neighborhoods: Neighborhood[],
+  latitude: number,
+  longitude: number
+): Neighborhood | null {
   const pt = point([longitude, latitude]);
-  return NEIGHBORHOODS.find((n) => booleanPointInPolygon(pt, n.feature)) ?? null;
+  return neighborhoods.find((n) => booleanPointInPolygon(pt, n.feature)) ?? null;
 }
