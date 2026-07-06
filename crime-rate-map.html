@@ -1,0 +1,45 @@
+<h2 class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Choropleth map of Milwaukee's 190 neighborhoods shaded by approximate relative crime rate, with a key explaining that tiers are based on reported Part I offenses per 1,000 residents relative to the citywide average.</h2>
+<div style="font-family:var(--font-sans),Helvetica,Arial,sans-serif;">
+<div style="background:var(--surface-1);border-radius:12px;padding:14px 16px;margin-bottom:12px;">
+<p style="font-size:13px;font-weight:500;margin:0 0 8px;color:var(--text-primary);">How the tiers are measured</p>
+<p style="font-size:13px;color:var(--text-secondary);margin:0 0 10px;line-height:1.6;">Tiers reflect reported Part I offenses (violent crimes such as homicide, robbery, and aggravated assault, plus property crimes such as burglary, theft, and vehicle theft) per 1,000 residents per year, expressed relative to the Milwaukee citywide average. Figures are approximate, based on Milwaukee Police Department reporting patterns through early 2026.</p>
+<table style="width:100%;font-size:12.5px;border-collapse:collapse;color:var(--text-secondary);">
+<tr><td style="padding:3px 8px 3px 0;width:110px;"><span style="display:inline-block;width:11px;height:11px;border-radius:2px;background:#fee5d9;border:0.5px solid rgba(0,0,0,.15);vertical-align:-1px;margin-right:6px;"></span>Lowest</td><td style="padding:3px 0;">Less than half the citywide rate (roughly under 25 per 1,000)</td></tr>
+<tr><td style="padding:3px 8px 3px 0;"><span style="display:inline-block;width:11px;height:11px;border-radius:2px;background:#fcae91;vertical-align:-1px;margin-right:6px;"></span>Lower</td><td style="padding:3px 0;">Below the citywide rate (roughly 25–45 per 1,000)</td></tr>
+<tr><td style="padding:3px 8px 3px 0;"><span style="display:inline-block;width:11px;height:11px;border-radius:2px;background:#fb6a4a;vertical-align:-1px;margin-right:6px;"></span>Moderate</td><td style="padding:3px 0;">Near the citywide rate (roughly 45–65 per 1,000)</td></tr>
+<tr><td style="padding:3px 8px 3px 0;"><span style="display:inline-block;width:11px;height:11px;border-radius:2px;background:#de2d26;vertical-align:-1px;margin-right:6px;"></span>High</td><td style="padding:3px 0;">Above the citywide rate (roughly 65–100 per 1,000)</td></tr>
+<tr><td style="padding:3px 8px 3px 0;"><span style="display:inline-block;width:11px;height:11px;border-radius:2px;background:#a50f15;vertical-align:-1px;margin-right:6px;"></span>Highest</td><td style="padding:3px 0;">Well above the citywide rate (roughly over 100 per 1,000)</td></tr>
+<tr><td style="padding:3px 8px 3px 0;"><span style="display:inline-block;width:11px;height:11px;border-radius:2px;background:#b4b2a9;vertical-align:-1px;margin-right:6px;"></span>Non-residential</td><td style="padding:3px 0;">Parks, airport, and industrial land — no resident population to rate</td></tr>
+</table>
+</div>
+<div id="mapwrap" style="position:relative;width:100%;">
+<div id="map" style="width:100%;"></div>
+<div id="tip" style="position:absolute;display:none;pointer-events:none;background:var(--surface-2);border:0.5px solid var(--border-strong);border-radius:6px;padding:6px 10px;font-size:13px;font-family:var(--font-sans),Helvetica,Arial,sans-serif;color:var(--text-primary);max-width:230px;"></div>
+</div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<script>
+const tier5=["Metcalfe Park","Franklin Heights","North Division","Garden Homes","Old North Milwaukee","Harambee","Borchert Field","Park West","Arlington Heights","Midtown","Walnut Hill","Washington Park","Sherman Park","Lincoln Creek","Hillside","Triangle","Triangle North"];
+const tier4=["Uptown","Grasslyn Manor","Roosevelt Grove","Thurston Woods","Silver Spring","Havenwoods","Northridge","Northridge Lakes","Capitol Heights","Grover Heights","Williamsburg","Rufus King","King Park","Halyard Park","Clarke Square","Historic Mitchell Street","Muskego Way","Silver City","Burnham Park","Concordia","Cold Spring Park","Merrill Park","Avenues West","Wahl Park"];
+const tier3=["Lincoln Village","Polonia","Layton Park","Mitchell Park","National Park","Riverwest","Haymarket","Marquette","Martin Drive","Miller Valley","The Valley / Pigsville","Kilbourn Town","Walker's Point","Southgate","Graceland","Lindsay Park","Hampton Heights","Long View","Maple Tree","Melody View","Granville Station","Mill Valley","Silver Swan"];
+const tier1=["Bay View","Fernwood","Saveland Park","Tippecanoe","Alcott Park","Alverno","College Heights","Clayton Crest","Red Oak Heights","Lake Park","Downer Woods","Northpoint","Murray Hill","Upper East Side","Yankee Hill","Historic Third Ward","Story Hill","Bluemound Heights","Washington Heights","Enderis Park","Cooper Park","Jackson Park","Nash Park","Lyons Park","Honey Creek Parkway","Johnson's Woods","Morgan Heights","Mount Mary","Brynwood","Servite Woods","Golden Valley","Whispering Hills","Fairview","Harbor View"];
+const nonres=["Zoo","Timmerman Airport","Land Bank","Jones' Island","Veterans Affairs","Mitchell Field","Dretzka Park","Brown Deer Park","Mc Govern Park","Lincoln Park","Estabrook Park","Menomonee River Valley","Menomonee River Parkway","Little Menomonee Parkway","Wick Field"];
+const tiers={};
+tier5.forEach(n=>tiers[n]=5);tier4.forEach(n=>tiers[n]=4);tier3.forEach(n=>tiers[n]=3);tier1.forEach(n=>tiers[n]=1);
+const labels={1:"Lowest — under ~25 per 1,000",2:"Lower — ~25–45 per 1,000",3:"Moderate — ~45–65 per 1,000",4:"High — ~65–100 per 1,000",5:"Highest — over ~100 per 1,000"};
+const ramp={1:"#fee5d9",2:"#fcae91",3:"#fb6a4a",4:"#de2d26",5:"#a50f15"};
+const isDark=matchMedia('(prefers-color-scheme: dark)').matches;
+const stroke=isDark?"rgba(255,255,255,.25)":"#ffffff";
+const W=680,H=820;
+const svg=d3.select('#map').append('svg').attr('viewBox','0 0 '+W+' '+H).attr('width','100%').attr('role','img').attr('aria-label','Map of Milwaukee neighborhoods shaded by approximate crime rate per 1,000 residents');
+const tip=document.getElementById('tip'),wrap=document.getElementById('mapwrap');
+d3.json('https://cdn.jsdelivr.net/gh/blackmad/neighborhoods@master/milwaukee.geojson').then(geo=>{
+const proj=d3.geoMercator().fitExtent([[8,8],[W-8,H-8]],geo);
+const path=d3.geoPath(proj);
+svg.selectAll('path').data(geo.features).join('path')
+.attr('d',path).attr('stroke',stroke).attr('stroke-width',0.7)
+.attr('fill',d=>{const n=d.properties.name;if(nonres.includes(n))return'#b4b2a9';return ramp[tiers[n]||2];})
+.on('mousemove',(e,d)=>{const n=d.properties.name;const t=nonres.includes(n)?'Park / non-residential':labels[tiers[n]||2];tip.innerHTML='<span style="font-weight:500">'+n+'</span><br><span style="color:var(--text-secondary);font-size:12px">'+t+'</span>';tip.style.display='block';const r=wrap.getBoundingClientRect();let x=e.clientX-r.left+12,y=e.clientY-r.top+12;if(x>r.width-240)x-=260;tip.style.left=x+'px';tip.style.top=y+'px';})
+.on('mouseleave',()=>{tip.style.display='none';});
+});
+</script>
